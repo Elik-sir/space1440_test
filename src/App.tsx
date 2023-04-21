@@ -9,8 +9,8 @@ import { resType, traverse } from './utils/utils';
 
 function App() {
   const [open, setOpen] = useState(false);
-  const [fields, setFields] = useState<XMLChild[] | undefined>([]);
-  const handleClick = () => {
+  const [params, setParams] = useState<XMLChild[] | undefined>([]);
+  const handleClickCreatePnf = () => {
     axios
       .get(Data, {
         headers: { 'Content-Type': 'application/xml; charset=utf-8' },
@@ -26,20 +26,27 @@ function App() {
             res: { children: [] as XMLChild[] } as XMLChild,
           };
           traverse(javaTypes, res);
-          const params = res?.res?.children;
-          //find URI
-          console.log(
-            params
-              ?.find((a) => a.name === 'xml-properties')
-              ?.children.find((item) => item.attributes.name === 'uriTemplate')
-              ?.attributes.value
-          );
-          setFields(
-            params
-              ?.find((a) => a.name === 'java-attributes')
-              ?.children?.filter(
-                (a) => a.attributes.type === 'java.lang.String'
-              )
+          setParams(res?.res?.children);
+          setOpen(true);
+        }
+      });
+  };
+  const handleClickCreateComplex = () => {
+    axios
+      .get(Data, {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+        },
+      })
+      .then(({ data }) => {
+        var xml: XMLChild = new XMLParser().parseFromString(data);
+        const javaTypes = xml.children[0].children.find(
+          (a) => a.name === 'java-types'
+        );
+        if (javaTypes) {
+          setParams(
+            javaTypes.children.find((a) => a.attributes.name === 'Complex')
+              ?.children
           );
           setOpen(true);
         }
@@ -47,10 +54,15 @@ function App() {
   };
   return (
     <div>
-      <Button variant='contained' onClick={handleClick}>
+      <Button variant='contained' onClick={handleClickCreatePnf}>
         create pnf
       </Button>
-      <ModalCreatePnf open={open} setOpen={setOpen} fields={fields} />
+      <Button variant='contained' onClick={handleClickCreateComplex}>
+        create complex
+      </Button>
+      {params?.length !== 0 && (
+        <ModalCreatePnf open={open} setOpen={setOpen} params={params} />
+      )}
     </div>
   );
 }

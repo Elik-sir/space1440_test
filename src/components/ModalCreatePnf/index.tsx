@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, MouseEventHandler, useEffect, useMemo } from 'react';
 import { useFormik } from 'formik';
+import * as yup from 'yup';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -8,32 +9,56 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { setter } from '../../@types/utils';
 import { TextField } from '@mui/material';
 import './styles.css';
+import axios from 'axios';
+import { createNewEntity, objType, validationSchema } from './utils';
 interface IProps {
   open: boolean;
   setOpen: setter<boolean>;
-  fields: XMLChild[] | undefined;
+  params?: XMLChild[];
+  url?: string;
 }
+const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
+  const fields = useMemo(() => {
+    return (
+      params
+        ?.find((a) => a.name === 'java-attributes')
+        ?.children?.filter((a) => a.attributes.type === 'java.lang.String') ??
+      []
+    );
+  }, [params]);
 
-// fields?.reduce((acc, item) => {
-//   if (!acc[item.attributes.name]) {
-//     acc[item.attributes.name] = '';
-//   }
-//   return acc;
-// }, {}),
-const ModalCreatePnf: FC<IProps> = ({ open, setOpen, fields }) => {
   const formik = useFormik({
-    initialValues: {},
+    initialValues: fields.reduce((acc, item) => {
+      if (!acc[item.attributes.name]) {
+        acc[item.attributes.name] = '';
+      }
+      return acc;
+    }, {} as objType),
     onSubmit: (values) => {
-      console.log(values);
+      formik
+        .validateForm(formik.values)
+        .then((val) =>
+          createNewEntity({ value: val, values: formik.values, params })
+        );
     },
+    validationSchema: yup.object(
+      fields.reduce((acc, item) => {
+        if (!!item.attributes?.required) {
+          //@ts-ignore
+          acc[item.attributes.name] = yup
+            .string()
+            .required(`${item.attributes.name} is required`);
+        }
+        return acc;
+      }, {})
+    ),
     validateOnChange: false,
   });
+
   const handleClose = () => {
     setOpen(false);
   };
-  const onSubmit = () => {
-    console.log(formik.values);
-  };
+
   return (
     <Dialog
       open={open}
@@ -42,18 +67,27 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, fields }) => {
       aria-describedby='alert-dialog-description'
     >
       <DialogTitle id='alert-dialog-title'>Create new Pnf</DialogTitle>
+
       <DialogContent>
-        <form onSubmit={formik.handleSubmit}>
+        <form>
           <div className='form__wrapper'>
-            {fields?.map((item) => (
+            {fields?.map(({ attributes }) => (
               <TextField
                 className='mt-16'
-                key={item.attributes.name}
-                id={item.attributes.name}
-                name={item.attributes.name}
-                label={item.attributes.name}
+                key={attributes.name}
+                id={attributes.name}
+                name={attributes.name}
+                label={attributes.name}
                 onChange={formik.handleChange}
                 variant='outlined'
+                error={
+                  formik.touched[attributes.name] &&
+                  Boolean(formik.errors[attributes.name])
+                }
+                helperText={
+                  formik.touched[attributes.name] &&
+                  formik.errors[attributes.name]
+                }
               />
             ))}
           </div>
@@ -61,7 +95,7 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, fields }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={onSubmit} autoFocus type='submit'>
+        <Button onClick={formik.handleSubmit as any} autoFocus type='submit'>
           Create
         </Button>
       </DialogActions>
