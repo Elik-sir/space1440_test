@@ -26,11 +26,21 @@ function App() {
             res: { children: [] as XMLChild[] } as XMLChild,
           };
           traverse(javaTypes, res);
-          const params = res?.res?.children
-            ?.find((a) => a.name === 'java-attributes')
-            ?.children.filter((a) => a.attributes.type === 'java.lang.String');
-          console.log(params);
-          setFields(params);
+          const params = res?.res?.children;
+          //find URI
+          console.log(
+            params
+              ?.find((a) => a.name === 'xml-properties')
+              ?.children.find((item) => item.attributes.name === 'uriTemplate')
+              ?.attributes.value
+          );
+          setFields(
+            params
+              ?.find((a) => a.name === 'java-attributes')
+              ?.children?.filter(
+                (a) => a.attributes.type === 'java.lang.String'
+              )
+          );
           setOpen(true);
         }
       });
