@@ -1,0 +1,7 @@
+.form__wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.mt-16 {
+  margin-top: 16px;
+}
