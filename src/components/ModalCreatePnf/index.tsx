@@ -25,7 +25,7 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
       []
     );
   }, [params]);
-
+  console.log(params);
   const formik = useFormik({
     initialValues: fields.reduce((acc, item) => {
       if (!acc[item.attributes.name]) {
@@ -65,9 +65,11 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
       aria-labelledby='alert-dialog-title'
       aria-describedby='alert-dialog-description'
     >
-      <DialogTitle id='alert-dialog-title'>Create new Pnf</DialogTitle>
+      <DialogTitle id='alert-dialog-title'>
+        Create new {params?.length && params[0].attributes.name}
+      </DialogTitle>
       <DialogContent>
-        <form>
+        <form role='create_entity_form'>
           <div className='form__wrapper'>
             {fields?.map(({ attributes }) => (
               <TextField

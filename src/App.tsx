@@ -7,7 +7,7 @@ import Data from './assets/aai_oxm_v27.xml';
 import './App.css';
 import { resType, searchPnf } from './utils/utils';
 
-function App() {
+const App = () => {
   const [open, setOpen] = useState(false);
   const [params, setParams] = useState<XMLChild[] | undefined>([]);
   const handleClickCreatePnf = () => {
@@ -64,6 +64,6 @@ function App() {
       )}
     </div>
   );
-}
+};
 
 export default App;
