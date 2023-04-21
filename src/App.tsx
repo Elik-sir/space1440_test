@@ -5,7 +5,7 @@ import { Button } from '@mui/material';
 import ModalCreatePnf from './components/ModalCreatePnf';
 import Data from './assets/aai_oxm_v27.xml';
 import './App.css';
-import { resType, traverse } from './utils/utils';
+import { resType, searchPnf } from './utils/utils';
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -16,16 +16,15 @@ function App() {
         headers: { 'Content-Type': 'application/xml; charset=utf-8' },
       })
       .then(({ data }) => {
-        var xml: XMLChild = new XMLParser().parseFromString(data);
+        const xml: XMLChild = new XMLParser().parseFromString(data);
         const javaTypes = xml.children[0].children.find(
           (a) => a.name === 'java-types'
         );
-
         if (javaTypes) {
           let res: resType = {
             res: { children: [] as XMLChild[] } as XMLChild,
           };
-          traverse(javaTypes, res);
+          searchPnf(javaTypes, res);
           setParams(res?.res?.children);
           setOpen(true);
         }

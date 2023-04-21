@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, useEffect, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Button from '@mui/material/Button';
@@ -9,8 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { setter } from '../../@types/utils';
 import { TextField } from '@mui/material';
 import './styles.css';
-import axios from 'axios';
-import { createNewEntity, objType, validationSchema } from './utils';
+import { createNewEntity, objType } from './utils';
 interface IProps {
   open: boolean;
   setOpen: setter<boolean>;
@@ -34,7 +33,7 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
       }
       return acc;
     }, {} as objType),
-    onSubmit: (values) => {
+    onSubmit: () => {
       formik
         .validateForm(formik.values)
         .then((val) =>
@@ -67,7 +66,6 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
       aria-describedby='alert-dialog-description'
     >
       <DialogTitle id='alert-dialog-title'>Create new Pnf</DialogTitle>
-
       <DialogContent>
         <form>
           <div className='form__wrapper'>
