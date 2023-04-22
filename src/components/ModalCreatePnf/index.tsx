@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { setter } from '../../@types/utils';
 import { TextField } from '@mui/material';
 import './styles.css';
-import { createNewEntity, objType } from './utils';
+import { createNewEntity, getInitialValues, objType } from './utils';
 interface IProps {
   open: boolean;
   setOpen: setter<boolean>;
@@ -25,14 +25,9 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
       []
     );
   }, [params]);
-  console.log(params);
+
   const formik = useFormik({
-    initialValues: fields.reduce((acc, item) => {
-      if (!acc[item.attributes.name]) {
-        acc[item.attributes.name] = '';
-      }
-      return acc;
-    }, {} as objType),
+    initialValues: getInitialValues(fields),
     onSubmit: () => {
       formik
         .validateForm(formik.values)
@@ -59,13 +54,8 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
-    >
-      <DialogTitle id='alert-dialog-title'>
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>
         Create new {params?.length && params[0].attributes.name}
       </DialogTitle>
       <DialogContent>

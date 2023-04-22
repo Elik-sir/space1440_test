@@ -29,3 +29,11 @@ export const createNewEntity = ({ value, values, params }: paramsType) => {
     );
   }
 };
+
+export const getInitialValues = (fields: XMLChild[]): objType =>
+  fields.reduce((acc, item) => {
+    if (!acc[item.attributes.name]) {
+      acc[item.attributes.name] = '';
+    }
+    return acc;
+  }, {} as objType);
