@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Button from '@mui/material/Button';
@@ -9,13 +9,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { setter } from '../../@types/utils';
 import { TextField } from '@mui/material';
 import './styles.css';
-import { createNewEntity, getInitialValues, objType } from './utils';
+import { createNewEntity, getInitialValues } from './utils';
+
 interface IProps {
   open: boolean;
   setOpen: setter<boolean>;
   params?: XMLChild[];
   url?: string;
 }
+
 const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
   const fields = useMemo(() => {
     return (
@@ -49,9 +51,9 @@ const ModalCreatePnf: FC<IProps> = ({ open, setOpen, params }) => {
     validateOnChange: false,
   });
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpen(false);
-  };
+  }, []);
 
   return (
     <Dialog open={open} onClose={handleClose}>

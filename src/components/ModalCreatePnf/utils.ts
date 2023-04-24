@@ -21,10 +21,11 @@ export const createNewEntity = ({ value, values, params }: paramsType) => {
         ?.find((a) => a.name === 'xml-properties')
         ?.children.find((item) => item.attributes.name === 'uniqueProps')
         ?.attributes.value ?? '';
+
     axios.put(
       window.location.origin +
         url?.replace(/\s*\{.*?\}\s*/g, values[uniqueProps]),
-      values,
+      removeUselessFields(values),
       { headers: { Authorization: 'Basic QUFJOkFBSQ==' } }
     );
   }
@@ -34,6 +35,14 @@ export const getInitialValues = (fields: XMLChild[]): objType =>
   fields.reduce((acc, item) => {
     if (!acc[item.attributes.name]) {
       acc[item.attributes.name] = '';
+    }
+    return acc;
+  }, {} as objType);
+
+const removeUselessFields = (values: objType) =>
+  Object.keys(values).reduce((acc, item) => {
+    if (values[item]) {
+      acc[item] = values[item];
     }
     return acc;
   }, {} as objType);
